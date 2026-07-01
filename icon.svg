@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFC061"/>
+      <stop offset="1" stop-color="#E8590C"/>
+    </linearGradient>
+    <linearGradient id="cup" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E4E7EB"/>
+    </linearGradient>
+  </defs>
+
+  <!-- rounded-square background -->
+  <rect x="0" y="0" width="1024" height="1024" rx="232" ry="232" fill="url(#bg)"/>
+
+  <!-- steam -->
+  <g fill="none" stroke="#FFFFFF" stroke-width="28" stroke-linecap="round" opacity="0.9">
+    <path d="M430 300 q-44 -54 0 -108 q44 -54 0 -108"/>
+    <path d="M512 300 q-44 -54 0 -108 q44 -54 0 -108"/>
+    <path d="M594 300 q-44 -54 0 -108 q44 -54 0 -108"/>
+  </g>
+
+  <!-- saucer -->
+  <ellipse cx="512" cy="742" rx="276" ry="52" fill="#FFFFFF" opacity="0.9"/>
+  <ellipse cx="512" cy="742" rx="276" ry="52" fill="none" stroke="#C8400A" stroke-width="6" opacity="0.25"/>
+
+  <!-- handle (behind body) -->
+  <path d="M712 442 q168 24 168 120 q0 96 -168 120" fill="none" stroke="#E4E7EB" stroke-width="56" stroke-linecap="round"/>
+
+  <!-- cup body -->
+  <rect x="296" y="372" width="416" height="290" rx="56" ry="56" fill="url(#cup)"/>
+
+  <!-- coffee surface -->
+  <ellipse cx="504" cy="392" rx="196" ry="40" fill="#5B3A1E"/>
+  <ellipse cx="504" cy="392" rx="196" ry="40" fill="none" stroke="#3B2417" stroke-width="6" opacity="0.5"/>
+</svg>

@@ -1,0 +1,7 @@
+# Build artifacts
+build/
+MouseMover.app/
+*.icns
+*.iconset/
+/MouseMover
+*.png
