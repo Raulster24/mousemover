@@ -1,9 +1,21 @@
 # MouseMover
 
-A tiny native macOS **menu bar app** that keeps your Mac awake and your status
-**active** (Teams, Slack, VPNs, etc.). Every interval it draws a quick, visible
-circle with the cursor and injects a real mouse-move event, then puts the cursor
-back where it was.
+A tiny native macOS **menu bar app** that keeps your Mac's screen awake and
+unlocked, so a long-running session is never interrupted by the display going to
+sleep or the lock screen kicking in.
+
+## Why it exists
+
+It started with long Claude Code sessions. When you leave an agent working on its
+own for a while, macOS eventually dims the display, starts the screen saver, and
+locks the screen. That interrupts what you are watching and, depending on your
+setup, can get in the way of a session you wanted to run unattended. MouseMover
+keeps the machine awake so the work keeps running and stays on screen. Every
+interval it also draws a quick, visible circle with the cursor and injects a real
+mouse-move event, so at a glance you can see it is doing its job.
+
+Keeping status apps like Teams or Slack showing "active" was never the point. It
+is only a side effect of the same mechanism (see below).
 
 No Python, no Homebrew packages, no dependencies. Just Swift compiled locally
 with the tools that ship with macOS.
@@ -16,17 +28,23 @@ Two independent layers:
 
 | Layer | Needs permission? | Effect |
 | --- | --- | --- |
-| Keep display awake + move the cursor (visible circle) | No | Screen never sleeps; you can see it working |
-| Register as real user input | **Yes — Accessibility** | Teams/Slack/idle-trackers see you as *active* |
+| Keep the display awake + move the cursor (visible circle) | No | The screen does not sleep or lock on you, and you can see it working |
+| Register as real user input | **Yes, Accessibility** | Also resets the system input idle timer, for stricter lock or idle policies |
 
-The visible movement uses `CGWarpMouseCursorPosition` (no permission). Getting
-counted as "active" requires injecting a synthetic input event, which macOS only
-allows if you grant the app **Accessibility** permission.
+The visible movement uses `CGWarpMouseCursorPosition`, which needs no permission
+and is enough on most setups to stop the display sleeping and locking. If your
+Mac is configured to lock based on real input activity, granting
+**Accessibility** lets the injected event reset that timer as well.
+
+As a side effect, the injected input also keeps idle-aware apps such as Teams or
+Slack showing you as active. That is not the goal, just something it happens to
+do. If that is what you are after, note that it is the one case where you have to
+grant Accessibility (see Install).
 
 ## Requirements
 
 - macOS 12 or later
-- Xcode **Command Line Tools** (for `swiftc`). If you don't have them:
+- Xcode **Command Line Tools** (for `swiftc`). If you do not have them:
   `xcode-select --install`
 
 ## Install
@@ -38,9 +56,12 @@ cd mousemover
 ```
 
 `install.sh` builds the app, copies it to `/Applications`, sets it to launch at
-login, and opens the Accessibility settings pane. Then:
+login, and opens the Accessibility settings pane. The screen-stays-awake layer
+already works at this point, with no permission. Only if you are using it for
+"active" status in Teams, Slack, or similar idle-aware apps, which is not the
+primary intent, do you have to grant Accessibility:
 
-1. **System Settings → Privacy & Security → Accessibility → turn ON "MouseMover"**
+1. **System Settings, Privacy & Security, Accessibility, turn ON "MouseMover"**
 2. Reload it so the permission takes effect:
    ```bash
    launchctl kickstart -k gui/$(id -u)/local.rahul.mousemover
@@ -51,13 +72,13 @@ login, and opens the Accessibility settings pane. Then:
 Click the coffee-cup icon (☕︎) in the menu bar:
 
 - **Start / Stop** (⌘S)
-- **Move now (test)** (⌘M) — fire a circle immediately to confirm it works
-- **Move every** — 15 / 30 / 60 / 120 / 300 seconds (default 60)
+- **Move now (test)** (⌘M), fire a circle immediately to confirm it works
+- **Move every**, 15 / 30 / 60 / 120 / 300 seconds (default 60)
 - **Quit** (⌘Q)
 
-Default interval is 60s, which keeps Teams active (its away threshold is a few
-minutes). If you set it very high (300s) it may briefly flip to away between
-nudges.
+The default interval is 60s, which comfortably stays ahead of typical
+display-sleep and lock timers. If you set it very high (300s), the screen could
+briefly dim or lock between nudges, depending on your Energy Saver settings.
 
 ## Uninstall
 
@@ -73,17 +94,18 @@ This app is **ad-hoc signed** (no paid Apple Developer account). macOS ties the
 Accessibility grant to the app's exact signature, so:
 
 - You grant Accessibility **once per machine**.
-- If you **rebuild / reinstall** (e.g. `git pull` + `./install.sh`), the
-  signature changes and the grant resets — just turn the toggle on again.
+- If you rebuild or reinstall (for example `git pull` then `./install.sh`), the
+  signature changes and the grant resets. Just turn the toggle on again.
   `install.sh` already resets the stale grant for you so the prompt is clean.
 
 ## How it verifies itself
 
 macOS keeps two idle timers: a hardware one (IOKit) and a CoreGraphics event
-timer (what Teams/Electron read). Warping the cursor only resets the hardware
-timer; the injected event is what resets the CoreGraphics timer. If Teams still
-shows you away, Accessibility isn't effective — re-grant it as above.
+timer. Warping the cursor keeps the display awake and resets the hardware timer;
+the injected event is what resets the CoreGraphics timer, which is what governs
+the screen saver and input-based lock. If the screen still locks on you,
+Accessibility is not effective. Re-grant it as above.
 
 ## License
 
-MIT — do whatever you want.
+MIT, do whatever you want.

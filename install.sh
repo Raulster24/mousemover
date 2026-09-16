@@ -62,13 +62,16 @@ cat <<'MSG'
  ✔ MouseMover installed and running (coffee-cup menu bar icon).
 ============================================================
 
-REQUIRED for Teams/Slack "active" status:
+The screen-stays-awake + visible mouse movement already works
+now, with no permission needed. To pause or quit, use the menu
+bar icon.
+
+Only if you want "active" status in Teams, Slack, or similar
+idle-aware apps (not the primary purpose) do you need to grant
+Accessibility:
   System Settings -> Privacy & Security -> Accessibility
   -> turn ON "MouseMover"   (the pane was just opened for you)
 
 Then reload it so the permission takes effect:
   launchctl kickstart -k gui/$(id -u)/local.rahul.mousemover
-
-The screen-stays-awake + visible mouse movement already works
-without that permission. To pause/quit, use the menu bar icon.
 MSG
